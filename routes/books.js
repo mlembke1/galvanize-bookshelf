@@ -1,26 +1,19 @@
 // 'use strict';
 const express = require('express');
 const router = express.Router();
-// const bodyParser = require('body-parser')
-const morgan = require('morgan')
 const knex = require('../knex')
 const humps =  require('humps')
 
-// YOUR CODE HERE
-// router.use(bodyParser.json())
 
-let lastId  
-
-router.get('/books', (req, res) => {
+router.get('/', (req, res) => {
   knex('books')
   .orderBy('title', 'asc')
   .then(book => {
-    lastId = book[book.length-1].id
     res.json(humps.camelizeKeys(book))
   })
 })
 
-router.get('/books/:id', (req, res) => {
+router.get('/:id', (req, res) => {
   const { id } = req.params
   knex('books')
   .where('id', id)
@@ -29,25 +22,59 @@ router.get('/books/:id', (req, res) => {
   })
 })
 
-router.post('/books', (req, res) => {
-    req.body['id'] = lastId + 1
-    res.status(200).json(humps.camelizeKeys(req.body))
+router.post('/', (req, res) => {
+    knex('books')
+    .insert({
+      title: req.body.title,
+      author: req.body.author,
+      genre: req.body.genre,
+      description: req.body.description,
+      cover_url: req.body.coverUrl
+    })
+    .returning('*')
+    .then(data => {
+      res.json(humps.camelizeKeys(data[0]))
+    })
   })
 
 
-router.patch('/books/:id', (req, res) => {
-  const { id } = req.params
-  req.body['id'] = id
-  res.status(200).json(req.body)
-})
+router.patch('/:id', (req, res, next) => {
+   knex('books')
+   .where('id', req.params.id)
+   .limit(1)
+   .update(humps.decamelizeKeys({
+     title: req.body.title,
+     author: req.body.author,
+     genre: req.body.genre,
+     description: req.body.description,
+     coverUrl: req.body.coverUrl
+   }))
+     .returning('*')
+     .then((result) => {
+       res.json(humps.camelizeKeys(result[0]))
+     })
+  })
 
-router.delete('/books/:id', (req, res) => {
+
+router.delete('/:id', (req, res) => {
   const { id } = req.params
   knex('books')
-  .select('title', 'author', 'genre', 'description', 'cover_url')
   .where('id', id)
+  .first()
   .then(book => {
-    res.status(200).json(humps.camelizeKeys(book)[0])
+    knex('books')
+    .del()
+    .where('id', id)
+    .then(() => {
+      res.json({
+        title: book.title,
+        author: book.author,
+        genre: book.genre,
+        description: book.description,
+        coverUrl: book.cover_url
+      })
+    })
+    .catch(err => next(err))
   })
 })
 

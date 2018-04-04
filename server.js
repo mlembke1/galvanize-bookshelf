@@ -26,6 +26,7 @@ switch (app.get('env')) {
   default:
 }
 
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -47,7 +48,7 @@ const favorites = require('./routes/favorites');
 const token = require('./routes/token');
 const users = require('./routes/users');
 
-app.use(books);
+app.use('/books', books)
 app.use(favorites);
 app.use(token);
 app.use(users);
