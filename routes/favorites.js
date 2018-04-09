@@ -45,9 +45,35 @@ const postToFavs = (req, res, next) => {
     })
 }
 
-router.get('/', getAll)
-router.get('/check', checkForBookInDB)
-router.post('/', postToFavs)
+const deleteFromFavs = (req, res, next) => {
+  const token = req.cookies.token
+  const email = jwt.decode(token)
+  knex('users')
+    .then(allUsers => {
+      const loggedInUser = allUsers.filter(user => user.email === email)
+      knex('favorites')
+        .where('book_id', req.body.bookId)
+        .del()
+          res.status(200).json({
+            userId: loggedInUser[0].id,
+            bookId: req.body.bookId
+          })
+        })
+}
+
+const hasToken = (req, res, next) => {
+  if(req.cookies.token === undefined) {
+    res.type('plain/text')
+    res.status(401).send('Unauthorized')
+  } else {
+    next()
+  }
+}
+
+router.get('/', hasToken, getAll)
+router.get('/check', hasToken, checkForBookInDB)
+router.post('/', hasToken, postToFavs)
+router.delete('/', hasToken, deleteFromFavs)
 
 
 module.exports = router;
