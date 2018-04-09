@@ -6,12 +6,6 @@ const humps =  require('humps')
 
 
 
-router.get('/', getAllBooks)
-router.get('/:id', getBookById)
-router.post('/', postNewBook)
-router.patch('/:id', updateBookById)
-router.delete('/:id', deleteBookById)
-
 
 
 const getAllBooks = (req, res) => {
@@ -87,4 +81,14 @@ const deleteBookById = (req, res) => {
     .catch(err => next(err))
   })
 }
+
+
+
+router.get('/', getAllBooks)
+router.get('/:id', getBookById)
+router.post('/', postNewBook)
+router.patch('/:id', updateBookById)
+router.delete('/:id', deleteBookById)
+
+
 module.exports = router;

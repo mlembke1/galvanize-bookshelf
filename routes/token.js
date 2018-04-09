@@ -21,9 +21,9 @@ router.get('/', (req, res, next) => {
 const emailPasses = (req, res, next) => {
   return knex('users')
     .select('email')
-    .first()
+    .where('email', req.body.email)
     .then(result => {
-      if (result.email !== req.body.email) {
+      if (result[0] === undefined) {
         res.status(400)
         res.type('text/plain')
         .send('Bad email or password')

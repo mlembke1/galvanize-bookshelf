@@ -6,6 +6,15 @@ const knex = require('../knex')
 const humps = require('humps')
 const jwt = require('jsonwebtoken')
 
+const hasToken = (req, res, next) => {
+  if(req.cookies.token === undefined) {
+    res.type('plain/text')
+    res.status(401).send('Unauthorized')
+  } else {
+    next()
+  }
+}
+
 
 const getAllFavs = (req, res, next) => {
   knex('favorites')
@@ -59,15 +68,6 @@ const deleteFromFavs = (req, res, next) => {
             bookId: req.body.bookId
           })
         })
-}
-
-const hasToken = (req, res, next) => {
-  if(req.cookies.token === undefined) {
-    res.type('plain/text')
-    res.status(401).send('Unauthorized')
-  } else {
-    next()
-  }
 }
 
 router.get('/', hasToken, getAllFavs)
