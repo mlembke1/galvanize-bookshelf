@@ -36,11 +36,11 @@ const emailPasses = (req, res, next) => {
 // FUNCTION TO VERIFY THAT THE PASSWORD IS CORRECT
 const passwordPasses = (req, res, next) => {
   return knex('users')
-    .select('hashed_password')
-    .first()
+    .select('hashed_password', 'email')
+    // .where('email', req.body.email)
     .then(result => {
-      const hashedPassword = result.hashed_password
-      bcrypt.compare(req.body.password, hashedPassword).then(res => {
+      const storedHashedPassword = result[0].hashed_password
+      bcrypt.compare(req.body.password, storedHashedPassword).then(res => {
         return res
       }).then(result => {
         const passwordsMatch = result
