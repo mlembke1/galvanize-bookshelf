@@ -7,7 +7,7 @@ const humps = require('humps')
 const jwt = require('jsonwebtoken')
 
 
-const getAll = (req, res, next) => {
+const getAllFavs = (req, res, next) => {
   knex('favorites')
     .join('books', 'books.id', 'favorites.book_id')
     .then(result => {
@@ -70,7 +70,7 @@ const hasToken = (req, res, next) => {
   }
 }
 
-router.get('/', hasToken, getAll)
+router.get('/', hasToken, getAllFavs)
 router.get('/check', hasToken, checkForBookInDB)
 router.post('/', hasToken, postToFavs)
 router.delete('/', hasToken, deleteFromFavs)

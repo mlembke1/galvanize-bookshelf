@@ -5,24 +5,34 @@ const knex = require('../knex')
 const humps =  require('humps')
 
 
-router.get('/', (req, res) => {
+
+router.get('/', getAllBooks)
+router.get('/:id', getBookById)
+router.post('/', postNewBook)
+router.patch('/:id', updateBookById)
+router.delete('/:id', deleteBookById)
+
+
+
+const getAllBooks = (req, res) => {
   knex('books')
   .orderBy('title', 'asc')
   .then(book => {
     res.json(humps.camelizeKeys(book))
   })
-})
+}
 
-router.get('/:id', (req, res) => {
+const getBookById = (req, res) => {
   const { id } = req.params
   knex('books')
   .where('id', id)
   .then(book => {
     res.json(humps.camelizeKeys(book)[0])
   })
-})
+}
 
-router.post('/', (req, res) => {
+
+const postNewBook = (req, res) => {
     knex('books')
     .insert({
       title: req.body.title,
@@ -35,10 +45,10 @@ router.post('/', (req, res) => {
     .then(data => {
       res.json(humps.camelizeKeys(data[0]))
     })
-  })
+}
 
 
-router.patch('/:id', (req, res, next) => {
+const updateBookById = (req, res, next) => {
    knex('books')
    .where('id', req.params.id)
    .limit(1)
@@ -53,10 +63,10 @@ router.patch('/:id', (req, res, next) => {
      .then((result) => {
        res.json(humps.camelizeKeys(result[0]))
      })
-  })
+}
 
 
-router.delete('/:id', (req, res) => {
+const deleteBookById = (req, res) => {
   const { id } = req.params
   knex('books')
   .where('id', id)
@@ -76,6 +86,5 @@ router.delete('/:id', (req, res) => {
     })
     .catch(err => next(err))
   })
-})
-
+}
 module.exports = router;
