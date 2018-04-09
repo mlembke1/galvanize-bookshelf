@@ -4,8 +4,39 @@ const router = express.Router();
 const knex = require('../knex')
 const humps =  require('humps')
 
+// const isParamValid = (req, res, next) => {
+//     knex('books')
+//     .then(result => {
+//       if(!result.includes(req.params.id)){
+//         res.type('text/plain')
+//         res.status(404).send('Not Found')
+//       } else {
+//         next()
+//       }
+//     })
+// }
 
-
+const isReqBodyValid = (req, res, next) => {
+  const { title, author, genre, description, coverUrl } = req.body
+  if (title === undefined){
+    res.type('text/plain')
+    res.status(400).send('Title must not be blank')
+  } else if (author === undefined){
+    res.type('text/plain')
+    res.status(400).send('Author must not be blank')
+  } else if (genre === undefined){
+    res.type('text/plain')
+    res.status(400).send('Genre must not be blank')
+  } else if (description === undefined){
+    res.type('text/plain')
+    res.status(400).send('Description must not be blank')
+  } else if (coverUrl === undefined){
+    res.type('text/plain')
+    res.status(400).send('Cover URL must not be blank')
+  } else {
+      next()
+  }
+}
 
 
 const getAllBooks = (req, res) => {
@@ -86,7 +117,7 @@ const deleteBookById = (req, res) => {
 
 router.get('/', getAllBooks)
 router.get('/:id', getBookById)
-router.post('/', postNewBook)
+router.post('/', isReqBodyValid, postNewBook)
 router.patch('/:id', updateBookById)
 router.delete('/:id', deleteBookById)
 

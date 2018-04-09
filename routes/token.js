@@ -17,6 +17,18 @@ router.get('/', (req, res, next) => {
   }
 })
 
+const isEmailOrPassUndefined = (req, res, next) => {
+  if(req.body.email === undefined){
+    res.type('text/plain')
+    res.status(400).send('Email must not be blank')
+  } else if (req.body.password === undefined) {
+    res.type('text/plain')
+    res.status(400).send('Password must not be blank')
+  } else {
+    next()
+  }
+}
+
 // FUNCTION TO VERIFY THAT THE EMAIL IS CORRECT
 const emailPasses = (req, res, next) => {
   return knex('users')
@@ -37,7 +49,7 @@ const emailPasses = (req, res, next) => {
 const passwordPasses = (req, res, next) => {
   return knex('users')
     .select('hashed_password', 'email')
-    // .where('email', req.body.email)
+    .where('email', req.body.email)
     .then(result => {
       const storedHashedPassword = result[0].hashed_password
       bcrypt.compare(req.body.password, storedHashedPassword).then(res => {
@@ -57,7 +69,7 @@ const passwordPasses = (req, res, next) => {
 
 
 // POST REQUEST
-router.post('/', emailPasses, passwordPasses, (req, res, next) => {
+router.post('/', isEmailOrPassUndefined, emailPasses, passwordPasses, (req, res, next) => {
   const {
     email,
     password

@@ -1,5 +1,5 @@
 'use strict';
-
+const boom = require('boom')
 const express = require('express');
 const router = express.Router();
 const knex = require('../knex')
@@ -15,6 +15,44 @@ const hasToken = (req, res, next) => {
   }
 }
 
+// const doesBookExistInBooks = (req, res, next) => {
+//   knex('books')
+//     .select('id')
+//     .then(bookIds => {
+//         const allIDsInBooks = bookIds.map(bookId => bookId.id)
+//         console.log(allIDsInBooks)
+//         if(!allIDsInBooks.includes(req.query.bookId)){
+//           res.type('plain/text')
+//           res.status(404).send('Book not found')
+//         } else {
+//           next()
+//         }
+//     })
+// }
+
+// const doesBookExistInFavs = (req, res, next) => {
+//   knex('favorites')
+//     .select('book_id')
+//     .then(bookIdsInFavs => {
+//         const allIdsInFavs = bookIdsInFavs.map(bookId => bookIdsInFavs.id)
+//         if(!allIdsInFavs.includes(req.query.bookId)){
+//           res.type('plain/text')
+//           res.status(404).send('Favorite not found')
+//         } else {
+//           next()
+//         }
+//     })
+// }
+
+
+// const isBookIDInteger = (req, res, next) => {
+//   if( req.query.bookId === undefined || typeof req.query.bookId != 'number'){
+//     res.type('text/plain')
+//     res.status(400).send('Book ID must be an integer')
+//   } else {
+//     next()
+//   }
+// }
 
 const getAllFavs = (req, res, next) => {
   knex('favorites')
@@ -72,8 +110,8 @@ const deleteFromFavs = (req, res, next) => {
 
 router.get('/', hasToken, getAllFavs)
 router.get('/check', hasToken, checkForBookInDB)
-router.post('/', hasToken, postToFavs)
-router.delete('/', hasToken, deleteFromFavs)
+router.post('/',  hasToken, postToFavs)
+router.delete('/',  hasToken, deleteFromFavs)
 
 
 module.exports = router;
