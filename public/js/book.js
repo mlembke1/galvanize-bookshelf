@@ -110,9 +110,11 @@
         .done((isFavorite) => {
           if (isFavorite) {
             $('#removeFavorite').removeClass('hide');
+            $('#addFavorite').addClass('hide');
           }
           else {
             $('#addFavorite').removeClass('hide');
+            $('#removeFavorite').addClass('hide');
           }
         })
         .fail(($xhr) => {

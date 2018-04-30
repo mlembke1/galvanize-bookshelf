@@ -49,10 +49,21 @@ const getAllBooks = (req, res) => {
 
 const getBookById = (req, res) => {
   const { id } = req.params
-  knex('books')
+    knex('books')
+    .where('id', id)
+    .then(book => {
+      res.json(humps.camelizeKeys(book)[0])
+  })
+}
+
+const isBookInFavorites =  (req, res, next) => {
+  const { id } = req.params
+  return knex('favorites')
   .where('id', id)
-  .then(book => {
-    res.json(humps.camelizeKeys(book)[0])
+  .then(bookExistsInFavorites => {
+    let bookExists
+    bookExistsInFavorites ? bookExists = true : bookExists = false
+    res.json(bookExists)
   })
 }
 
@@ -117,6 +128,7 @@ const deleteBookById = (req, res) => {
 
 router.get('/', getAllBooks)
 router.get('/:id', getBookById)
+router.get('/:id', isBookInFavorites)
 router.post('/', isReqBodyValid, postNewBook)
 router.patch('/:id', updateBookById)
 router.delete('/:id', deleteBookById)
